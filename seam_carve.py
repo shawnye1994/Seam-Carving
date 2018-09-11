@@ -116,7 +116,7 @@ if __name__ == '__main__':
     start_time = time.time()
     crop_img = main(img, [487, 487])
     print('Time elapse:', time.time() - start_time)
-    cv2.imwrite('cropped_tower.jpg', crop_img)
+    cv2.imwrite('tower_seam_carving.jpg', crop_img)
 
 
         
