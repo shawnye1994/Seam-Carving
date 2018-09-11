@@ -23,8 +23,7 @@ def path_search_and_crop(original_img):
     img_gray = cv2.cvtColor(original_img, cv2.COLOR_BGR2GRAY)
     energy_map = cv2.Laplacian(img_gray, cv2.CV_64F)
     energy_map = np.absolute(energy_map)
-    #calculate the accumlated energy map
-    result_map = energy_map
+    accumulated_map = energy_map
     H,W = energy_map.shape
     for h in range(1,H):
         for w in range(0,W):
@@ -36,10 +35,10 @@ def path_search_and_crop(original_img):
                 upper_pixels = [energy_map[h-1, w-1], energy_map[h-1,w], 
                                 energy_map[h-1, w+1]]
             min_energy = np.amin(upper_pixels)
-            result_map[h,w] += min_energy
+            accumulated_map[h,w] += min_energy
     
     #find the lowest energy path
-    min_index = np.argmin(result_map[H-1,:])
+    min_index = np.argmin(accumulated_map[H-1,:])
     if min_index == 0:
         upper_index = [0, 2]
     elif min_index == W-1:
@@ -51,7 +50,7 @@ def path_search_and_crop(original_img):
     single_crop[H-1, min_index:] = original_img[H-1, min_index+1:]
     
     for h in reversed(range(0, H-1)):
-        temp_index = np.argmin(result_map[h,upper_index[0]:upper_index[1]])
+        temp_index = np.argmin(accumulated_map[h,upper_index[0]:upper_index[1]])
         min_index = list(range(upper_index[0], upper_index[1]))[temp_index]
         path.append([h, min_index])
         single_crop[h, 0:min_index] = original_img[h, 0:min_index]
@@ -113,11 +112,11 @@ def main(original_img, desired_resolution):
     return final_img
 
 if __name__ == '__main__':
-    img = cv2.imread('test.jpg')
+    img = cv2.imread('tower.jpg')
     start_time = time.time()
-    crop_img = main(img, [600, 400])
+    crop_img = main(img, [487, 487])
     print('Time elapse:', time.time() - start_time)
-    cv2.imwrite('cropped_test.jpg', crop_img)
+    cv2.imwrite('cropped_tower.jpg', crop_img)
 
 
         
